@@ -5,11 +5,17 @@
 
     <!-- 主内容区域 -->
     <main class="MindMap">
-      <MindMapCanvas ref="mindMapRef" @nodeSelected="onNodeSelected" />
+      <MindMapCanvas v-if="showMindMap" ref="mindMapRef" @nodeSelected="onNodeSelected" />
+      <MarkdownEditor v-else ref="markdownEditorRef" />
     </main>
 
     <!-- 右侧边栏 -->
-    <RightSidebar :selected-node="selectedNode" :mind-map-ref="mindMapRef" />
+    <RightSidebar 
+      :selected-node="selectedNode" 
+      :mind-map-ref="mindMapRef" 
+      :show-mind-map="showMindMap" 
+      @toggle-view="toggleView"
+    />
   </div>
 </template>
 
@@ -18,6 +24,7 @@ import { ref } from 'vue'
 import MindMapCanvas from './MindMapCanvas.vue'
 import LeftSidebar from './LeftSidebar.vue'
 import RightSidebar from './RightSidebar.vue'
+import MarkdownEditor from './Markdown/MarkdownEditor.vue'
 
 interface Node {
   id: number
@@ -28,11 +35,17 @@ interface Node {
 }
 
 const mindMapRef = ref()
+const markdownEditorRef = ref()
 const msg = 'Hello'
 const selectedNode = ref<Node | null>(null)
+const showMindMap = ref(true) // 控制显示思维导图还是Markdown编辑器
 
 function onNodeSelected(node: Node | null) {
   selectedNode.value = node
+}
+
+function toggleView() {
+  showMindMap.value = !showMindMap.value
 }
 </script>
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import MarkdownEditor from './components/Markdown/MarkdownEditor.vue'
+import MainLayout from './components/MainLayout.vue'
 </script>
 
 <template>
   <div class="app-container">
-    <MarkdownEditor />
+    <MainLayout />
   </div>
 </template>
 

@@ -1,6 +1,14 @@
 <template>
   <aside class="RightSidebar" :class="{ collapsed: isCollapsed }" @mouseenter="isCollapsed = false" @mouseleave="isCollapsed = true">
-    <div v-if="selectedNode" class="node-panel">
+    <!-- 视图切换按钮 -->
+    <div class="view-toggle">
+      <button class="toggle-btn" @click="handleToggleView">
+        {{ showMindMap ? '📝 切换到编辑器' : '🗺️ 切换到思维导图' }}
+      </button>
+    </div>
+
+    <!-- 节点操作面板 -->
+    <div v-if="selectedNode && showMindMap" class="node-panel">
       <h1>节点操作</h1>
       <div class="node-info">
         <h3>{{ selectedNode.label }}</h3>
@@ -12,9 +20,11 @@
         <button class="action-btn danger" @click="deleteNode">删除</button>
       </div>
     </div>
+    
+    <!-- 无选中状态或显示Markdown编辑器时 -->
     <div v-else class="no-selection">
       <h1>右侧边栏</h1>
-      <p>点击节点查看操作选项</p>
+      <p>{{ showMindMap ? '点击节点查看操作选项' : '当前为Markdown编辑器模式' }}</p>
     </div>
   </aside>
 </template>
@@ -30,32 +40,43 @@ interface Node {
   parentId?: number
 }
 
+// 定义事件
+const emit = defineEmits<{
+  'toggle-view': []
+}>()
+
 // 接收props
 const props = defineProps<{
   selectedNode: Node | null
   mindMapRef: any
+  showMindMap: boolean
 }>()
 
 // 侧边栏折叠状态
 const isCollapsed = ref(false)
 
+// 处理视图切换
+function handleToggleView() {
+  emit('toggle-view')
+}
+
 // 编辑节点
 function editNode() {
-  if (props.selectedNode && props.mindMapRef) {
+  if (props.selectedNode && props.mindMapRef && props.showMindMap) {
     props.mindMapRef.startEditNode(props.selectedNode.id)
   }
 }
 
 // 添加子节点
 function addChildNode() {
-  if (props.selectedNode && props.mindMapRef) {
+  if (props.selectedNode && props.mindMapRef && props.showMindMap) {
     props.mindMapRef.startAddChildNode(props.selectedNode.id)
   }
 }
 
 // 删除节点
 function deleteNode() {
-  if (props.selectedNode && props.mindMapRef) {
+  if (props.selectedNode && props.mindMapRef && props.showMindMap) {
     if (confirm(`确定要删除节点 "${props.selectedNode.label}" 及其所有子节点吗？`)) {
       props.mindMapRef.deleteSelectedNode(props.selectedNode.id)
     }
@@ -69,13 +90,46 @@ function deleteNode() {
   height: 100vh;
   background-color: #acb0b3;
   transition: all 0.3s ease;
-  overflow: hidden;
+  overflow-y: auto;
   padding-left: 0.5rem;
   margin-left: 0.5rem;
   float: right;
   box-shadow: inset 5px 0 5px -5px #29627e;
   font-style: italic;
   color: #29627e;
+}
+
+/* 视图切换按钮样式 */
+.view-toggle {
+  padding: 16px;
+  border-bottom: 2px solid #29627e;
+  margin-bottom: 16px;
+  background: rgba(41, 98, 126, 0.1);
+  overflow: hidden;
+}
+
+.toggle-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #29627e;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.toggle-btn:hover {
+  background-color: #1f4b61;
+}
+
+.toggle-btn:active {
+  transform: scale(0.98);
 }
 
 .RightSidebar.collapsed {
@@ -88,6 +142,7 @@ function deleteNode() {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .node-panel h1 {
@@ -96,6 +151,9 @@ function deleteNode() {
   color: #29627e;
   border-bottom: 2px solid #29627e;
   padding-bottom: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .node-info {
@@ -104,6 +162,7 @@ function deleteNode() {
   border-radius: 6px;
   margin-bottom: 20px;
   border: 1px solid rgba(41, 98, 126, 0.2);
+  overflow: hidden;
 }
 
 .node-info h3 {
@@ -111,12 +170,18 @@ function deleteNode() {
   font-size: 1.1em;
   color: #29627e;
   font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .node-info p {
   margin: 0;
   font-size: 0.9em;
   color: #666;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .actions {
@@ -136,6 +201,9 @@ function deleteNode() {
   font-weight: 500;
   transition: all 0.2s ease;
   text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .action-btn:hover {
@@ -160,16 +228,23 @@ function deleteNode() {
   padding: 16px;
   text-align: center;
   color: #666;
+  overflow: hidden;
 }
 
 .no-selection h1 {
   font-size: 1.2em;
   margin-bottom: 12px;
   color: #29627e;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .no-selection p {
   font-size: 0.9em;
   line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
