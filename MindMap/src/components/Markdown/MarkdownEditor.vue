@@ -1133,7 +1133,79 @@ $$`;
       // 更新光标位置
       handleCursorMove();
     });
+
+    // 处理预览区点击事件 - 滚动到对应行并设置光标位置
+    const handlePreviewClick = (event: MouseEvent) => {
+      if (!editorTextarea.value) return;
+      
+      // 获取点击的元素，查找带有data-line-range属性的最近祖先
+      let clickedElement = event.target as HTMLElement;
+      let targetWithLineRange: HTMLElement | null = null;
+      
+      // 向上查找带有data-line-range属性的元素
+      while (clickedElement && clickedElement !== markdownPreview.value) {
+        if (clickedElement.getAttribute('data-line-range')) {
+          targetWithLineRange = clickedElement;
+          break;
+        }
+        clickedElement = clickedElement.parentElement as HTMLElement;
+      }
+      
+      if (targetWithLineRange) {
+        // 阻止事件冒泡，确保子元素的click覆盖父元素
+        event.stopPropagation();
+        
+        const lineRangeStr = targetWithLineRange.getAttribute('data-line-range');
+        if (lineRangeStr) {
+          const [startLine, endLine] = lineRangeStr.split(',').map(Number);
+          const targetLine = startLine; // 使用起始行作为目标行
+          
+          // 滚动到目标行并设置光标位置
+          scrollToLineAndSetCursor(targetLine);
+        }
+      }
+    };
     
+    // 滚动到指定行并设置光标位置
+    function scrollToLineAndSetCursor(lineNumber: number) {
+      if (!editorTextarea.value) return;
+      
+      const textarea = editorTextarea.value;
+      const lines = textarea.value.split('\n');
+      
+      // 确保行号在有效范围内
+      const validLineNumber = Math.max(1, Math.min(lineNumber, lines.length));
+      
+      // 计算到目标行的字符位置
+      let charPosition = 0;
+      for (let i = 0; i < validLineNumber - 1; i++) {
+        charPosition += lines[i].length + 1; // +1 用于换行符
+      }
+      
+      // 计算滚动位置
+      const lineHeight = 21; // 与CSS中设置的行高一致
+      const textareaHeight = textarea.clientHeight;
+      const centerScrollTop = (validLineNumber - 1) * lineHeight - textareaHeight / 2 + lineHeight / 2;
+      
+      // 设置滚动位置
+      textarea.scrollTop = Math.max(0, Math.min(centerScrollTop, textarea.scrollHeight - textareaHeight));
+      
+      // 设置光标位置
+      textarea.focus();
+      textarea.setSelectionRange(charPosition, charPosition);
+      
+      // 更新光标位置和高亮显示
+      cursorPosition.line = validLineNumber;
+      cursorPosition.column = 1;
+      highlightCursorLine();
+      highlightHtmlElement();
+    }
+    
+    // 为预览区添加点击事件监听器
+    if (markdownPreview.value) {
+      markdownPreview.value.addEventListener('click', handlePreviewClick);
+    }
+
     // 初始化时设置光标位置
     handleCursorMove();
   }
@@ -1315,6 +1387,42 @@ textarea {
 }
 
 /* GitHub风格的Markdown样式 */
+
+/* 预览区HTML标签hover样式 - 确保子元素的hover覆盖父元素 */
+.markdown-preview :deep([data-line-range]) {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.markdown-preview :deep([data-line-range]):hover {
+  background-color: rgba(0, 123, 255, 0.12) !important;
+  transform: translateX(2px);
+}
+
+/* 确保子元素的hover覆盖父元素 */
+.markdown-preview :deep([data-line-range] *) {
+  cursor: pointer;
+}
+
+.markdown-preview :deep([data-line-range] *:hover) {
+  background-color: inherit !important;
+}
+
+/* 特定元素的hover样式微调 */
+.markdown-preview :deep(h1[data-line-range]):hover,
+.markdown-preview :deep(h2[data-line-range]):hover,
+.markdown-preview :deep(h3[data-line-range]):hover,
+.markdown-preview :deep(h4[data-line-range]):hover,
+.markdown-preview :deep(h5[data-line-range]):hover,
+.markdown-preview :deep(h6[data-line-range]):hover {
+  padding-left: 4px;
+  margin-left: -4px;
+}
+
+.markdown-preview :deep(blockquote[data-line-range]):hover {
+  padding-left: 14px;
+  margin-left: -14px;
+}
 
 /* 预览区HTML标签高亮样式 */
 .markdown-preview :deep(.highlighted-element) {
