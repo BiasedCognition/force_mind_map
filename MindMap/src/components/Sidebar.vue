@@ -1,32 +1,32 @@
 <template>
-    <div class="MainPage">
-    <aside class="Sidebar" :class="{ collapsed: leftIsCollapsed }" @mouseenter="leftIsCollapsed = false" @mouseleave="leftIsCollapsed = true">
-        <h1 class="Sidebar-title">{{ msg }}</h1>
-        <ul>
-            <li v-for="item in navItems" :key="item.id" class="Sidebar-item">{{ item.text }}</li>
+    <div class="flex">
+    <aside class="transition-all duration-300 overflow-hidden bg-gray-400 h-screen" :class="leftIsCollapsed ? 'w-[50px]' : 'w-[200px]'" @mouseenter="leftIsCollapsed = false" @mouseleave="leftIsCollapsed = true">
+        <h1 class="text-2xl m-0 p-0 bg-gray-700 text-white overflow-hidden">{{ msg }}</h1>
+        <ul class="m-0 p-0 list-none">
+            <li v-for="item in navItems" :key="item.id" class="py-1 px-4 border-b border-gray-200 cursor-pointer h-5 overflow-hidden hover:bg-gray-700 hover:text-white">{{ item.text }}</li>
         </ul>
     </aside>
 
-    <main class="MindMap">
+    <main class="flex-1 h-screen bg-gray-100 flex justify-center items-center">
         <MindMapCanvas ref="mindMapRef" @nodeSelected="onNodeSelected" />
     </main>
 
-    <aside class="RightSidebar" :class="{ collapsed: rightIsCollapsed }" @mouseenter="rightIsCollapsed = false" @mouseleave="rightIsCollapsed = true">
-        <div v-if="selectedNode" class="node-panel">
-            <h1>节点操作</h1>
-            <div class="node-info">
-                <h3>{{ selectedNode.label }}</h3>
-                <p>ID: {{ selectedNode.id }}</p>
+    <aside class="transition-all duration-300 overflow-y-auto" :class="rightIsCollapsed ? 'w-[50px]' : 'w-[200px]'" @mouseenter="rightIsCollapsed = false" @mouseleave="rightIsCollapsed = true">
+        <div v-if="selectedNode" class="p-4 h-full flex flex-col">
+            <h1 class="text-lg mb-4 text-blue-700 border-b-2 border-blue-700 pb-2">节点操作</h1>
+            <div class="bg-blue-50 p-3 rounded-lg mb-5 border border-blue-100">
+                <h3 class="mb-2 text-blue-700 font-semibold text-base">节点：{{ selectedNode.label }}</h3>
+                <p class="m-0 text-sm text-gray-600">ID: {{ selectedNode.id }}</p>
             </div>
-            <div class="actions">
-                <button class="action-btn" @click="editNode">编辑</button>
-                <button class="action-btn" @click="addChildNode">添加子节点</button>
-                <button class="action-btn danger" @click="deleteNode">删除</button>
+            <div class="flex flex-col gap-2.5">
+                <button class="action-btn px-4 py-2 border border-gray-400 bg-white rounded text-base text-blue-700 font-medium transition-all duration-200 text-left" @click="editNode">编辑</button>
+                <button class="action-btn px-4 py-2 border border-gray-400 bg-white rounded text-base text-blue-700 font-medium transition-all duration-200 text-left" @click="addChildNode">添加子节点</button>
+                <button class="action-btn danger px-4 py-2 border border-red-200 bg-white rounded text-base text-red-600 font-medium transition-all duration-200 text-left" @click="deleteNode">删除</button>
             </div>
         </div>
-        <div v-else class="no-selection">
-            <h1>右侧边栏</h1>
-            <p>点击节点查看操作选项</p>
+        <div v-else class="p-4 text-center text-gray-600">
+            <h1 class="text-lg mb-3 text-blue-700">右侧边栏</h1>
+            <p class="text-sm leading-relaxed">点击节点查看操作选项</p>
         </div>
     </aside>
 
@@ -83,144 +83,7 @@
 </script>
 
 <style scoped>
-* {
-    margin: 0;
-    padding: 0;
-}
-
-.MainPage {
-  
-  display: flex;
-
-}
-
-.Sidebar {
-  margin: 0;
-  padding: 0;
-  width: 200px;
-  height: 100vh;
-  background-color: #acb0b3;
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.Sidebar-item {
-  padding: 5px 16px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  height: 20px;
-  overflow: hidden;
-}
-
-.Sidebar-item:hover {
-  background-color: #57595b;
-  color: white;
-}
-
-
-.Sidebar-title {
-  font-size: 1.5em;
-  margin: 0;
-  padding: 0;
-  background-color: #57595b;
-  color: white;
-  overflow: hidden;
-}
-
-.Sidebar.collapsed {
-  width: 50px;
-}
-
-.MindMap {
-  flex: 1;
-  height: 100vh;
-  background-color: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: calc(100% - 400px);
-}
-
-.RightSidebar {
-  width: 200px;
-  height: 100vh;
-  background-color: #acb0b3;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  padding-left: 0.5rem;
-  margin-left: 0.5rem;
-  float: right;
-  box-shadow: inset 5px 0 5px -5px #29627e;
-  font-style: italic;
-  color: #29627e;
-}
-
-.RightSidebar.collapsed{
-    width: 50px;
-}
-
-ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-}
-
-/* 节点操作面板样式 */
-.node-panel {
-    padding: 16px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.node-panel h1 {
-    font-size: 1.2em;
-    margin-bottom: 16px;
-    color: #29627e;
-    border-bottom: 2px solid #29627e;
-    padding-bottom: 8px;
-}
-
-.node-info {
-    background: rgba(41, 98, 126, 0.1);
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(41, 98, 126, 0.2);
-}
-
-.node-info h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.1em;
-    color: #29627e;
-    font-weight: 600;
-}
-
-.node-info p {
-    margin: 0;
-    font-size: 0.9em;
-    color: #666;
-}
-
-.actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.action-btn {
-    padding: 10px 16px;
-    border: 1px solid #acb0b3;
-    background: #ffffff;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #29627e;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    text-align: left;
-}
-
+/* 保留无法用Tailwind直接替代的复杂交互样式 */
 .action-btn:hover {
     background: #f0f8ff;
     border-color: #29627e;
@@ -228,32 +91,9 @@ ul {
     box-shadow: 0 2px 4px rgba(41, 98, 126, 0.2);
 }
 
-.action-btn.danger {
-    color: #dc2626;
-    border-color: #fecaca;
-}
-
 .action-btn.danger:hover {
     background: #fef2f2;
     border-color: #fca5a5;
     box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
 }
-
-.no-selection {
-    padding: 16px;
-    text-align: center;
-    color: #666;
-}
-
-.no-selection h1 {
-    font-size: 1.2em;
-    margin-bottom: 12px;
-    color: #29627e;
-}
-
-.no-selection p {
-    font-size: 0.9em;
-    line-height: 1.4;
-}
-
 </style>

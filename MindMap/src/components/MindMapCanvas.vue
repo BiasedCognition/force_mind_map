@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import qtCommunicationService, { type GraphData, type Node as QtNode } from '../services/qtCommunicationService'
 
 const emit = defineEmits<{
   nodeSelected: [node: Node | null]
@@ -63,15 +64,69 @@ const styleOpts = reactive({
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('keyup', onKeyup)
-  loadFromLocal()
-  // 若无数据则创建根
-  if (nodes.length === 0) {
-    const el = containerRef.value
-    const rect = el?.getBoundingClientRect()
-    const cx = rect ? rect.width / 2 : 400
-    const cy = rect ? rect.height / 2 : 300
-    nodes.push({ id: nextId.value++, x: cx, y: cy, label: 'Root' })
-    saveToLocal()
+  
+  // 连接到Qt后端的事件
+  qtCommunicationService.on('graphUpdated', handleGraphUpdate)
+  qtCommunicationService.on('nodeAdded', handleNodeAdded)
+  qtCommunicationService.on('nodeRemoved', handleNodeRemoved)
+  qtCommunicationService.on('nodeUpdated', handleNodeUpdated)
+  
+  // 尝试从Qt后端获取数据
+  loadFromQtBackend()
+})
+
+// 从Qt后端加载数据
+async function loadFromQtBackend() {
+  if (qtCommunicationService.getIsConnected()) {
+    try {
+      const graph = await qtCommunicationService.getFullGraph()
+      if (graph && graph.nodes && graph.nodes.length > 0) {
+        // 转换Qt节点格式到Vue组件使用的格式
+        const vueNodes = graph.nodes.map((qtNode: QtNode, index: number) => ({
+          id: parseInt(qtNode.id),
+          x: qtNode.x || 400 + (index * 50),
+          y: qtNode.y || 300 + (index % 2 === 0 ? -50 : 50),
+          label: qtNode.text,
+          parentId: qtNode.parent ? parseInt(qtNode.parent) : undefined
+        }))
+        
+        // 清空现有节点并添加新节点
+        nodes.length = 0
+        vueNodes.forEach(node => nodes.push(node))
+        
+        // 更新nextId
+        nextId.value = Math.max(...nodes.map(n => n.id), 1) + 1
+      } else {
+        // 如果Qt后端没有数据，使用本地数据或创建根节点
+        loadFromLocal()
+        if (nodes.length === 0) {
+          const el = containerRef.value
+          const rect = el?.getBoundingClientRect()
+          const cx = rect ? rect.width / 2 : 400
+          const cy = rect ? rect.height / 2 : 300
+          const rootNode = { id: nextId.value++, x: cx, y: cy, label: 'Root' }
+          nodes.push(rootNode)
+          saveToLocal()
+          
+          // 将根节点同步到Qt后端
+          qtCommunicationService.addNode(rootNode.id.toString(), rootNode.label)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data from Qt backend:', error)
+      loadFromLocal()
+    }
+  } else {
+    // 如果没有连接到Qt后端，使用本地数据
+    loadFromLocal()
+    if (nodes.length === 0) {
+      const el = containerRef.value
+      const rect = el?.getBoundingClientRect()
+      const cx = rect ? rect.width / 2 : 400
+      const cy = rect ? rect.height / 2 : 300
+      nodes.push({ id: nextId.value++, x: cx, y: cy, label: 'Root' })
+      saveToLocal()
+    }
   }
   
   // 在DOM更新后，将第二个元素的位置设置为第一个元素的上半部分中心
@@ -87,11 +142,160 @@ onMounted(() => {
       secondNode.y = firstNode.y - 80
     }
   })
-})
+}
+
+// 添加节点函数
+function addNode(x: number, y: number, parentId?: number) {
+  const node = { id: nextId.value++, x, y, label: 'New Node', parentId }
+  nodes.push(node)
+  // 不要直接设置selectedNode.value，而是通过设置selectedId来更新选中状态
+  selectedId.value = node.id
+  saveToLocal()
+  
+  // 触发选中事件
+  emit('nodeSelected', node)
+  
+  // 同步到Qt后端
+  qtCommunicationService.addNode(node.id.toString(), node.label, parentId?.toString())
+  if (parentId) {
+    // 创建父子连接
+    qtCommunicationService.addConnection(parentId.toString(), node.id.toString())
+  }
+}
+
+// 移除节点函数
+function removeNode(nodeId: number) {
+  const index = nodes.findIndex(node => node.id === nodeId)
+  if (index !== -1) {
+    // 移除关联的节点
+    const nodeToRemove = nodes[index]
+    // 不要直接重新赋值nodes，而是使用splice方法
+    const toRemove = new Set<number>()
+    function dfs(cur: number) {
+      toRemove.add(cur)
+      nodes.filter(n => n.parentId === cur).forEach(ch => dfs(ch.id))
+    }
+    dfs(nodeId)
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      if (toRemove.has(nodes[i].id)) {
+        nodes.splice(i, 1)
+      }
+    }
+    
+    if (selectedId.value === nodeId) {
+      selectedId.value = null
+      emit('nodeSelected', null)
+    }
+    saveToLocal()
+    
+    // 同步到Qt后端
+    qtCommunicationService.removeNode(nodeId.toString())
+  }
+}
+
+// 更新节点函数
+function updateNode(nodeId: number, data: Partial<Node>) {
+  const node = nodes.find(node => node.id === nodeId)
+  if (node) {
+    Object.assign(node, data)
+    saveToLocal()
+    
+    // 同步到Qt后端
+    qtCommunicationService.updateNode(node.id.toString(), node.label)
+    
+    // 如果节点位置发生变化，同步位置信息
+    if ('x' in data || 'y' in data) {
+      qtCommunicationService.updateNodePosition(node.id.toString(), node.x, node.y)
+    }
+    
+    // 如果父节点发生变化，更新连接
+    if ('parentId' in data) {
+      // 先移除旧连接
+      const oldConnections = nodes.filter(n => n.parentId === node.id)
+      oldConnections.forEach(n => {
+        if (node.parentId) {
+          qtCommunicationService.removeConnection(node.parentId.toString(), node.id.toString())
+        }
+      })
+      
+      // 添加新连接
+      if (node.parentId) {
+        qtCommunicationService.addConnection(node.parentId.toString(), node.id.toString())
+      }
+    }
+  }
+}
+
+// 处理Qt后端的图更新事件
+function handleGraphUpdate(graph: GraphData) {
+  console.log('Handling graph update from Qt:', graph)
+  if (graph && graph.nodes && graph.nodes.length > 0) {
+    // 转换Qt节点格式到Vue组件使用的格式
+    const vueNodes = graph.nodes.map((qtNode: QtNode) => ({
+      id: parseInt(qtNode.id),
+      x: qtNode.x || 400,
+      y: qtNode.y || 300,
+      label: qtNode.text,
+      parentId: qtNode.parent ? parseInt(qtNode.parent) : undefined
+    }))
+    
+    // 清空现有节点并添加新节点
+    nodes.length = 0
+    vueNodes.forEach(node => nodes.push(node))
+    
+    // 更新nextId
+    nextId.value = Math.max(...nodes.map(n => n.id), 1) + 1
+  }
+}
+
+// 处理Qt后端的节点添加事件
+function handleNodeAdded(node: QtNode) {
+  console.log('Handling node added from Qt:', node)
+  // 检查节点是否已存在
+  const existingNode = nodes.find(n => n.id === parseInt(node.id))
+  if (!existingNode) {
+    nodes.push({
+      id: parseInt(node.id),
+      x: node.x || 400,
+      y: node.y || 300,
+      label: node.text,
+      parentId: node.parent ? parseInt(node.parent) : undefined
+    })
+  }
+}
+
+// 处理Qt后端的节点删除事件
+function handleNodeRemoved(id: string) {
+  console.log('Handling node removed from Qt:', id)
+  const nodeId = parseInt(id)
+  const index = nodes.findIndex(n => n.id === nodeId)
+  if (index !== -1) {
+    nodes.splice(index, 1)
+  }
+}
+
+// 处理Qt后端的节点更新事件
+function handleNodeUpdated(node: QtNode) {
+  console.log('Handling node updated from Qt:', node)
+  const nodeId = parseInt(node.id)
+  const existingNode = nodes.find(n => n.id === nodeId)
+  if (existingNode) {
+    existingNode.label = node.text
+    if (node.x !== undefined) existingNode.x = node.x
+    if (node.y !== undefined) existingNode.y = node.y
+    if (node.parent) existingNode.parentId = parseInt(node.parent)
+  }
+}
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('keyup', onKeyup)
+  
+  // 清理Qt后端事件监听器
+  qtCommunicationService.off('graphUpdated', handleGraphUpdate)
+  qtCommunicationService.off('nodeAdded', handleNodeAdded)
+  qtCommunicationService.off('nodeRemoved', handleNodeRemoved)
+  qtCommunicationService.off('nodeUpdated', handleNodeUpdated)
 })
 
 function onKeydown(e: KeyboardEvent) {
@@ -233,17 +437,10 @@ function onMouseMove(e: MouseEvent) {
 function onDblClickCanvas() {
   if (!isAdding.value) return
   const parentId = selectedParentId.value!
-  // 新节点的位置已经是相对于根节点的坐标
-  nodes.push({
-    id: nextId.value++,
-    x: tempPos.x,
-    y: tempPos.y,
-    label: `Node ${nextId.value - 1}`,
-    parentId
-  })
+  // 使用我们的addNode函数添加节点，确保与Qt后端同步
+  addNode(tempPos.x, tempPos.y, parentId)
   selectedId.value = null
   selectedParentId.value = null
-  saveToLocal()
 }
 
 function onMouseDownNode(e: MouseEvent, n: Node) {
@@ -274,10 +471,13 @@ function onDblClickNode(n: Node) {
 
 function confirmEdit() {
   if (editingId.value === null) return
-  const n = nodes.find(x => x.id === editingId.value)
-  if (n) n.label = editingText.value.trim() || n.label
+  const nodeId = editingId.value
+  const newLabel = editingText.value.trim()
+  if (newLabel) {
+    // 使用我们的updateNode函数更新节点，确保与Qt后端同步
+    updateNode(nodeId, { label: newLabel })
+  }
   editingId.value = null
-  saveToLocal()
 }
 
 function cancelEdit() {
@@ -300,9 +500,9 @@ function startAddChildNode(nodeId: number) {
 }
 
 function deleteSelectedNode(nodeId: number) {
+  // 删除节点及其所有子节点
   deleteNodeAndDescendants(nodeId)
   selectedId.value = null
-  saveToLocal()
   emit('nodeSelected', null)
 }
 
@@ -354,8 +554,13 @@ function deleteNodeAndDescendants(id: number) {
   }
   dfs(id)
   for (let i = nodes.length - 1; i >= 0; i--) {
-    if (toDelete.has(nodes[i].id)) nodes.splice(i, 1)
+    if (toDelete.has(nodes[i].id)) {
+      // 从Qt后端移除节点
+      qtCommunicationService.removeNode(nodes[i].id.toString())
+      nodes.splice(i, 1)
+    }
   }
+  saveToLocal()
 }
 
 // 中键或空格+左键 平移
@@ -414,6 +619,9 @@ function autoLayout() {
       // 所以这里计算出的子节点位置也自动相对于根节点
       c.x = p.x + radius * Math.cos(angle)
       c.y = p.y + radius * Math.sin(angle)
+      
+      // 同步到Qt后端
+      qtCommunicationService.updateNodePosition(c.id.toString(), c.x, c.y)
     })
   })
   saveToLocal()
@@ -429,6 +637,29 @@ function saveToLocal() {
     style: { ...styleOpts }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+  
+  // 如果连接到Qt后端，将完整图数据同步到Qt后端
+  if (qtCommunicationService.getIsConnected()) {
+    try {
+      qtCommunicationService.updateFullGraph({
+        nodes: nodes.map(n => ({
+          id: n.id.toString(),
+          text: n.label,
+          x: n.x,
+          y: n.y,
+          parent: n.parentId?.toString()
+        })),
+        links: nodes
+          .filter(n => n.parentId)
+          .map(n => ({
+            source: n.parentId!.toString(),
+            target: n.id.toString()
+          }))
+      })
+    } catch (error) {
+      console.error('Error syncing full graph to Qt backend:', error)
+    }
+  }
 }
 
 function loadFromLocal() {
@@ -458,7 +689,7 @@ const contentStyle = computed(() => ({
 
 <template>
   <div
-    class="map-container"
+    class="relative w-full h-full user-select-none overflow-hidden bg-[#f8f9fb]"
     ref="containerRef"
     @mousemove="onMouseMove"
     @mouseup="onMouseUp"
@@ -468,25 +699,25 @@ const contentStyle = computed(() => ({
     @wheel.passive.prevent="onWheel"
   >
     <!-- 工具栏 -->
-    <div class="toolbar">
-      <button class="btn" @click="resetView">重置视图</button>
-      <button class="btn" @click="autoLayout">自动布局</button>
-      <span class="sep"></span>
-      <label class="lbl">节点背景 <input type="color" v-model="styleOpts.nodeBg" /></label>
-      <label class="lbl">节点边框 <input type="color" v-model="styleOpts.nodeBorder" /></label>
-      <label class="lbl">文字 <input type="color" v-model="styleOpts.nodeText" /></label>
-      <label class="lbl">连线 <input type="color" v-model="styleOpts.linkColor" /></label>
-      <label class="lbl">线宽
+    <div class="absolute top-2 left-2 z-10 bg-white/90 border border-gray-200 rounded-lg px-2 py-1.5 flex items-center gap-2 shadow-md">
+      <button class="px-2 py-1 border border-gray-300 bg-white rounded text-xs cursor-pointer" @click="resetView">重置视图</button>
+      <button class="px-2 py-1 border border-gray-300 bg-white rounded text-xs cursor-pointer" @click="autoLayout">自动布局</button>
+      <span class="w-[1px] h-5 bg-gray-200 mx-[1px]"></span>
+      <label class="text-xs text-gray-500 flex items-center gap-1">节点背景 <input type="color" v-model="styleOpts.nodeBg" /></label>
+      <label class="text-xs text-gray-500 flex items-center gap-1">节点边框 <input type="color" v-model="styleOpts.nodeBorder" /></label>
+      <label class="text-xs text-gray-500 flex items-center gap-1">文字 <input type="color" v-model="styleOpts.nodeText" /></label>
+      <label class="text-xs text-gray-500 flex items-center gap-1">连线 <input type="color" v-model="styleOpts.linkColor" /></label>
+      <label class="text-xs text-gray-500 flex items-center gap-1">线宽
         <input type="range" min="1" max="6" step="1" v-model.number="styleOpts.linkWidth" />
       </label>
-      <label class="lbl">弧度
+      <label class="text-xs text-gray-500 flex items-center gap-1">弧度
         <input type="range" min="0" max="0.6" step="0.02" v-model.number="styleOpts.curvature" />
       </label>
     </div>
 
     <!-- 可缩放/平移内容 -->
-    <div class="content" :style="contentStyle">
-      <svg class="edges">
+    <div class="absolute inset-0 origin-top-left" :style="contentStyle">
+      <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
         <g>
           <path
             v-for="e in edges"
@@ -511,7 +742,7 @@ const contentStyle = computed(() => ({
       <div
         v-for="n in nodes"
         :key="n.id"
-        class="node"
+        class="node absolute -translate-x-1/2 -translate-y-1/2 cursor-grab z-1"
         :class="{ selected: selectedId === n.id }"
         :style="{ left: n.x + 'px', top: n.y + 'px' }"
         @mousedown.stop="onMouseDownNode($event, n)"
@@ -519,14 +750,14 @@ const contentStyle = computed(() => ({
         @click.stop="selectNode(n.id)"
       >
         <div
-          class="node-body"
+          class="node-body px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap inline-flex items-center gap-1.5"
           :class="{ editing: editingId === n.id }"
           :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }"
         >
           <template v-if="editingId === n.id">
             <input
               :id="`edit-${n.id}`"
-              class="edit-input"
+              class="edit-input text-xs border-none outline-none p-0 m-0 bg-transparent w-[160px]"
               v-model="editingText"
               @keydown.enter.prevent="confirmEdit"
               @keydown.esc.stop.prevent="cancelEdit"
@@ -537,94 +768,25 @@ const contentStyle = computed(() => ({
             {{ n.label }}
           </template>
         </div>
-        <div class="hint" v-if="editingId !== n.id && !isAdding">单击选中，双击编辑，拖拽移动</div>
-        <div class="hint adding" v-else-if="selectedParentId === n.id">选择位置后双击画布放置</div>
+        <div class="hint mt-1 text-[11px] text-gray-500 text-center" v-if="editingId !== n.id && !isAdding">单击选中，双击编辑，拖拽移动</div>
+        <div class="hint adding mt-1 text-[11px] text-blue-500 text-center" v-else-if="selectedParentId === n.id">选择位置后双击画布放置</div>
       </div>
 
       <!-- 预览子节点 -->
       <div
         v-if="isAdding"
-        class="node ghost"
+        class="node ghost absolute -translate-x-1/2 -translate-y-1/2"
         :style="{ left: tempPos.x + 'px', top: tempPos.y + 'px' }"
       >
-        <div class="node-body" :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }">新节点</div>
-        <div class="hint">双击画布确认，Esc 取消</div>
+        <div class="node-body px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap inline-flex items-center gap-1.5" :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }">新节点</div>
+        <div class="hint mt-1 text-[11px] text-gray-500 text-center">双击画布确认，Esc 取消</div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.map-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-  overflow: hidden;
-  background: #f8f9fb;
-}
-
-.toolbar {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.btn {
-  padding: 4px 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.sep {
-  width: 1px;
-  height: 20px;
-  background: #e5e7eb;
-  margin: 0 2px;
-}
-
-.lbl {
-  font-size: 12px;
-  color: #4b5563;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.content {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 0;
-}
-
-.edges {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.node {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  cursor: grab;
-  z-index: 1;
-}
-
+/* 保留无法用Tailwind直接替代的复杂交互样式 */
 .node.selected .node-body {
   box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
   border-color: #4a90e2;
@@ -637,15 +799,7 @@ const contentStyle = computed(() => ({
 .node-body {
   background: #fff;
   border: 1px solid #dcdfe6;
-  padding: 6px 10px;
-  border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  font-size: 12px;
-  color: #333;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .del-btn {
@@ -665,27 +819,6 @@ const contentStyle = computed(() => ({
 .node-body.editing {
   box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
   border-color: #4a90e2;
-}
-
-.edit-input {
-  font-size: 12px;
-  border: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  width: 160px;
-}
-
-.node .hint {
-  margin-top: 4px;
-  font-size: 11px;
-  color: #999;
-  text-align: center;
-}
-
-.node .hint.adding {
-  color: #4a90e2;
 }
 
 .node.ghost .node-body {

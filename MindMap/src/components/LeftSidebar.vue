@@ -1,8 +1,14 @@
 <template>
-  <aside class="Sidebar" :class="{ collapsed: isCollapsed }" @mouseenter="isCollapsed = false" @mouseleave="isCollapsed = true">
-    <h1 class="Sidebar-title">{{ msg }}</h1>
-    <ul>
-      <li v-for="item in navItems" :key="item.id" class="Sidebar-item">{{ item.text }}</li>
+  <aside 
+    class="transition-all duration-300 overflow-hidden bg-gray-400 h-screen"
+    :class="isCollapsed ? 'w-12' : 'w-[50px]'"
+    @mouseenter="isCollapsed = false" 
+    @mouseleave="isCollapsed = true">
+    <h1 class="bg-gray-600 text-white text-2xl m-0 p-0 overflow-hidden">{{ msg }}</h1>
+    <ul class="m-0 p-0 list-none">
+      <li v-for="item in navItems" :key="item.id" class="p-[6px] px-4 border-b border-gray-300 cursor-pointer h-[20px] overflow-hidden hover:bg-gray-600 hover:text-white transition-colors">
+        {{ item.text }}
+      </li>
     </ul>
   </aside>
 </template>
@@ -37,45 +43,5 @@ const isCollapsed = ref(false)
 </script>
 
 <style scoped>
-.Sidebar {
-  margin: 0;
-  padding: 0;
-  width: 200px;
-  height: 100vh;
-  background-color: #acb0b3;
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.Sidebar-item {
-  padding: 5px 16px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  height: 20px;
-  overflow: hidden;
-}
-
-.Sidebar-item:hover {
-  background-color: #57595b;
-  color: white;
-}
-
-.Sidebar-title {
-  font-size: 1.5em;
-  margin: 0;
-  padding: 0;
-  background-color: #57595b;
-  color: white;
-  overflow: hidden;
-}
-
-.Sidebar.collapsed {
-  width: 50px;
-}
-
-ul {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
+/* 保持一些无法用Tailwind直接替代的过渡效果 */
 </style>

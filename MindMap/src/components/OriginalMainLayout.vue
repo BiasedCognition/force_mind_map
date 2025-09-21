@@ -5,7 +5,7 @@
 
     <!-- 主内容区域 -->
     <main class="flex-1 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-      <MindMapCanvas v-if="showMindMap" ref="mindMapRef" @nodeSelected="onNodeSelected" />
+      <OriginalMindMapCanvas v-if="showMindMap" ref="mindMapRef" @nodeSelected="onNodeSelected" />
       <MarkdownEditor v-else ref="markdownEditorRef" />
     </main>
 
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import MindMapCanvas from './MindMapCanvas.vue'
+import OriginalMindMapCanvas from './OriginalMindMapCanvas.vue'
 import LeftSidebar from './LeftSidebar.vue'
 import RightSidebar from './RightSidebar.vue'
 import MarkdownEditor from './Markdown/MarkdownEditor.vue'
@@ -48,7 +48,3 @@ function toggleView() {
   showMindMap.value = !showMindMap.value
 }
 </script>
-
-<style scoped>
-/* 保持一些无法用Tailwind直接替代的过渡效果 */
-</style>

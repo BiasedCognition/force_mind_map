@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { getCurrentInstance } from 'vue'
 // 导入主布局组件
-import MainLayout from './components/MainLayout.vue'
-
-// 从全局属性中获取Qt通信服务
-const { $qt } = getCurrentInstance()!.appContext.config.globalProperties
+import OriginalMainLayout from './OriginalMainLayout.vue'
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- 主布局组件 -->
-    <MainLayout />
+    <OriginalMainLayout />
     
     <!-- TailwindCSS 渲染验证元素 -->
     <div id="css-test-element" class="hidden">

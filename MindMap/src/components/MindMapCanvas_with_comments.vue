@@ -498,7 +498,7 @@ const contentStyle = computed(() => ({
   <!-- 思维导图容器 -->
   <!-- Vue的事件修饰符：@wheel.passive.prevent用于优化滚轮事件性能 -->
   <div
-    class="map-container"
+    class="relative w-full h-full user-select-none overflow-hidden bg-[#f8f9fb]"
     ref="containerRef" <!-- Vue的ref属性：获取DOM引用 -->
     @mousemove="onMouseMove"
     @mouseup="onMouseUp"
@@ -508,19 +508,19 @@ const contentStyle = computed(() => ({
     @wheel.passive.prevent="onWheel"
   >
     <!-- 工具栏 -->
-    <div class="toolbar">
-      <button class="btn" @click="resetView">重置视图</button>
-      <button class="btn" @click="autoLayout">自动布局</button>
-      <span class="sep"></span>
+    <div class="absolute top-2 left-2 z-10 bg-white/90 border border-gray-200 rounded-lg p-1.5 flex items-center gap-2 shadow-sm">
+      <button class="px-2 py-1 border border-gray-300 bg-white rounded text-xs cursor-pointer" @click="resetView">重置视图</button>
+      <button class="px-2 py-1 border border-gray-300 bg-white rounded text-xs cursor-pointer" @click="autoLayout">自动布局</button>
+      <span class="w-px h-5 bg-gray-200 mx-0.5"></span>
       <!-- Vue的双向数据绑定：v-model将input的值绑定到styleOpts对象的属性 -->
-      <label class="lbl">节点背景 <input type="color" v-model="styleOpts.nodeBg" /></label>
-      <label class="lbl">节点边框 <input type="color" v-model="styleOpts.nodeBorder" /></label>
-      <label class="lbl">文字 <input type="color" v-model="styleOpts.nodeText" /></label>
-      <label class="lbl">连线 <input type="color" v-model="styleOpts.linkColor" /></label>
-      <label class="lbl">线宽
+      <label class="text-xs text-gray-600 flex items-center gap-1">节点背景 <input type="color" v-model="styleOpts.nodeBg" /></label>
+      <label class="text-xs text-gray-600 flex items-center gap-1">节点边框 <input type="color" v-model="styleOpts.nodeBorder" /></label>
+      <label class="text-xs text-gray-600 flex items-center gap-1">文字 <input type="color" v-model="styleOpts.nodeText" /></label>
+      <label class="text-xs text-gray-600 flex items-center gap-1">连线 <input type="color" v-model="styleOpts.linkColor" /></label>
+      <label class="text-xs text-gray-600 flex items-center gap-1">线宽
         <input type="range" min="1" max="6" step="1" v-model.number="styleOpts.linkWidth" />
       </label>
-      <label class="lbl">弧度
+      <label class="text-xs text-gray-600 flex items-center gap-1">弧度
         <input type="range" min="0" max="0.6" step="0.02" v-model.number="styleOpts.curvature" />
       </label>
     </div>
@@ -556,23 +556,23 @@ const contentStyle = computed(() => ({
       <div
         v-for="n in nodes" <!-- Vue的列表渲染 -->
         :key="n.id"
-        class="node"
-        :class="{ selected: selectedId === n.id }" <!-- Vue的动态class -->
+        class="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab z-10"
+        :class="{ 'node-selected': selectedId === n.id }" <!-- Vue的动态class -->
         :style="{ left: n.x + 'px', top: n.y + 'px' }" <!-- Vue的动态style -->
         @mousedown.stop="onMouseDownNode($event, n)" <!-- Vue的事件修饰符：stop阻止事件冒泡 -->
         @dblclick.stop="onDblClickNode(n)"
         @click.stop="selectNode(n.id)"
       >
         <div
-          class="node-body"
-          :class="{ editing: editingId === n.id }"
+          class="p-1.5 px-2.5 rounded-lg shadow-sm text-xs whitespace-nowrap inline-flex items-center gap-1.5 node-body"
+          :class="{ 'node-body-editing': editingId === n.id }"
           :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }"
         >
           <!-- Vue的条件渲染：使用template包裹不同状态的内容 -->
           <template v-if="editingId === n.id">
             <input
               :id="`edit-${n.id}`"
-              class="edit-input"
+              class="text-xs border-none outline-none p-0 m-0 bg-transparent w-40"
               v-model="editingText" <!-- Vue的双向数据绑定 -->
               @keydown.enter.prevent="confirmEdit" <!-- Vue的按键修饰符 -->
               @keydown.esc.stop.prevent="cancelEdit"
@@ -584,18 +584,18 @@ const contentStyle = computed(() => ({
           </template>
         </div>
         <!-- 提示文本 -->
-        <div class="hint" v-if="editingId !== n.id && !isAdding">单击选中，双击编辑，拖拽移动</div>
-        <div class="hint adding" v-else-if="selectedParentId === n.id">选择位置后双击画布放置</div>
+        <div class="mt-1 text-[11px] text-gray-400 text-center" v-if="editingId !== n.id && !isAdding">单击选中，双击编辑，拖拽移动</div>
+        <div class="mt-1 text-[11px] text-blue-500 text-center" v-else-if="selectedParentId === n.id">选择位置后双击画布放置</div>
       </div>
 
       <!-- 预览子节点 -->
       <div
         v-if="isAdding"
-        class="node ghost"
+        class="absolute -translate-x-1/2 -translate-y-1/2 node-ghost"
         :style="{ left: tempPos.x + 'px', top: tempPos.y + 'px' }"
       >
-        <div class="node-body" :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }">新节点</div>
-        <div class="hint">双击画布确认，Esc 取消</div>
+        <div class="p-1.5 px-2.5 rounded-lg shadow-sm text-xs whitespace-nowrap inline-flex items-center gap-1.5" :style="{ background: styleOpts.nodeBg, borderColor: styleOpts.nodeBorder, color: styleOpts.nodeText }">新节点</div>
+        <div class="mt-1 text-[11px] text-gray-400 text-center">双击画布确认，Esc 取消</div>
       </div>
     </div>
   </div>
@@ -603,54 +603,6 @@ const contentStyle = computed(() => ({
 
 <style scoped>
 /* scoped样式：使用data-v-xxx前缀确保只应用于当前组件 */
-.map-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-  overflow: hidden;
-  background: #f8f9fb;
-}
-
-.toolbar {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.btn {
-  padding: 4px 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.sep {
-  width: 1px;
-  height: 20px;
-  background: #e5e7eb;
-  margin: 0 2px;
-}
-
-.lbl {
-  font-size: 12px;
-  color: #4b5563;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .content {
   position: absolute;
   inset: 0;
@@ -666,14 +618,7 @@ const contentStyle = computed(() => ({
   z-index: 0;
 }
 
-.node {
-  position: absolute;
-  transform: translate(-50%, -50%); /* 使节点中心点对齐坐标 */
-  cursor: grab;
-  z-index: 1;
-}
-
-.node.selected .node-body {
+.node-selected .node-body {
   box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
   border-color: #4a90e2;
 }
@@ -683,60 +628,15 @@ const contentStyle = computed(() => ({
 }
 
 .node-body {
-  background: #fff;
   border: 1px solid #dcdfe6;
-  padding: 6px 10px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  font-size: 12px;
-  color: #333;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.del-btn {
-  border: none;
-  background: transparent;
-  color: #ef4444;
-  font-weight: bold;
-  cursor: pointer;
-  opacity: 0.0;
-  transition: opacity .15s;
-}
-
-.node:hover .del-btn {
-  opacity: 1;
-}
-
-.node-body.editing {
+.node-body-editing {
   box-shadow: 0 0 0 2px rgba(74,144,226,0.25);
   border-color: #4a90e2;
 }
 
-.edit-input {
-  font-size: 12px;
-  border: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  width: 160px;
-}
-
-.node .hint {
-  margin-top: 4px;
-  font-size: 11px;
-  color: #999;
-  text-align: center;
-}
-
-.node .hint.adding {
-  color: #4a90e2;
-}
-
-.node.ghost .node-body {
+.node-ghost .node-body {
   opacity: 0.5;
   border-style: dashed;
 }
