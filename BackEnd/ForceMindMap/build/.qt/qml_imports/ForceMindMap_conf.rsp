@@ -1,0 +1,11 @@
+-rootPath
+D:/QTALLPROJECTS/ForceMindMap
+-cmake-output
+-output-file
+D:/QTALLPROJECTS/ForceMindMap/build/.qt/qml_imports/ForceMindMap_conf.cmake
+-importPath
+D:/QTALLPROJECTS/ForceMindMap/build
+-importPath
+D:/Qt/6.9.1/msvc2022_64/qml
+-qrcFiles
+D:/QTALLPROJECTS/ForceMindMap/build/.qt/rcc/resources.qrc

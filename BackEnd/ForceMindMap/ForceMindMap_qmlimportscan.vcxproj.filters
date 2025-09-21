@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\QTALLPROJECTS\ForceMindMap\CMakeFiles\1e581632c83dedf9dd5e7325b379a165\ForceMindMap_build.cmake.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\QTALLPROJECTS\ForceMindMap\CMakeFiles\7841cd70e179cfba2afbf1bd0df02d13\ForceMindMap_qmlimportscan.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\QTALLPROJECTS\ForceMindMap\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\QTALLPROJECTS\ForceMindMap\CMakeFiles\ForceMindMap_qmlimportscan" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7F3EDCA1-F40E-3557-85B3-D6BAF7C5516C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

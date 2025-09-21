@@ -1,0 +1,59 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>QWebEngine Test</title>
+            <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    text-align: center;
+                }
+                button {
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    margin: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>QWebEngineView & QWebChannel Test</h1>
+            <p>Testing basic communication between Qt C++ and JavaScript</p>
+            <button id="callCppBtn">Call C++ Function</button>
+            
+            <script>
+                // 等待文档加载完成
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('Document loaded');
+                    
+                    // 初始化WebChannel
+                    if (typeof QWebChannel !== 'undefined') {
+                        new QWebChannel(qt.webChannelTransport, function(channel) {
+                            console.log('WebChannel connected');
+                            
+                            // 获取bridge对象
+                            window.bridge = channel.objects.bridge;
+                            console.log('Bridge object obtained:', window.bridge);
+                             
+                            // 添加按钮点击事件
+                            document.getElementById('callCppBtn').addEventListener('click', function() {
+                                if (window.bridge && typeof window.bridge.cppFunction === 'function') {
+                                    console.log('Calling C++ function...');
+                                    window.bridge.cppFunction();
+                                } else {
+                                    console.error('Bridge or cppFunction not available');
+                                    alert('Error: Cannot communicate with C++ backend');
+                                }
+                            });
+                        });
+                    } else {
+                        console.error('QWebChannel is not defined!');
+                        alert('Error: QWebChannel not available');
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    

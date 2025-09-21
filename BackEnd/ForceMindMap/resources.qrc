@@ -1,0 +1,11 @@
+<RCC>
+        <qresource prefix="/">
+            <file>favicon.ico</file>
+            <file>d3.v7.min.js</file>
+            <file>mindmap.js</file>
+            <file>index.html</file>
+            <!-- 可选的KaTeX字体文件，当前应用可能不需要 -->
+            <!-- <file>assets/KaTeX_AMS-Regular-BQhdFMY1.woff2</file> -->
+            <!-- 更多KaTeX字体文件可根据需要取消注释 -->
+    </qresource>
+</RCC>

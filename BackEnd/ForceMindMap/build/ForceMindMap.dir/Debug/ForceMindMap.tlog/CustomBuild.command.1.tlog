@@ -1,0 +1,20 @@
+^D:\QTALLPROJECTS\FORCEMINDMAP\BUILD\CMAKEFILES\6FE60186A5EEB79EAA6C93CAADE96BC5\QRC_RESOURCES.CPP.RULE
+setlocal
+D:\Qt\6.9.1\msvc2022_64\bin\rcc.exe --output D:/QTALLPROJECTS/ForceMindMap/build/.qt/rcc/qrc_resources.cpp --name resources D:/QTALLPROJECTS/ForceMindMap/build/.qt/rcc/resources.qrc --no-zstd
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\QTALLPROJECTS\FORCEMINDMAP\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/QTALLPROJECTS/ForceMindMap -BD:/QTALLPROJECTS/ForceMindMap/build --check-stamp-file D:/QTALLPROJECTS/ForceMindMap/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

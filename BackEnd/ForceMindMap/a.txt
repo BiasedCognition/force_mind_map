@@ -1,0 +1,22 @@
+[main] 正在生成文件夹: d:/QTALLPROJECTS/ForceMindMap/build ALL_BUILD
+[build] 正在启动生成
+[proc] 正在执行命令: "C:\Program Files\CMake\bin\cmake.EXE" --build d:/QTALLPROJECTS/ForceMindMap/build --config Debug --target ALL_BUILD -j 24 --
+[build] 閫傜敤浜? .NET Framework MSBuild 鐗堟湰 17.14.10+8b8e13593
+[build] 
+[build] MSBUILD : error MSB1025: 杩愯?? MSBuild 鏃跺彂鐢熷唴閮ㄩ敊璇?銆?
+[build] System.UnauthorizedAccessException: 瀵硅矾寰勨�淐:\Users\锟界??锟介綎AppData\Local\Temp\MSBuildTemp鈥濈殑璁块棶琚?鎷掔粷銆?
+[build]    鍦? System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+[build]    鍦? System.IO.Directory.InternalCreateDirectory(String fullPath, String path, Object dirSecurityObj, Boolean checkHost)
+[build]    鍦? System.IO.Directory.InternalCreateDirectoryHelper(String path, Boolean checkHost)
+[build]    鍦? Microsoft.Build.Shared.FileUtilities.CreateFolderUnderTemp()
+[build]    鍦? Microsoft.Build.Shared.FileUtilities.get_TempFileDirectory()
+[build]    鍦? Microsoft.Build.Shared.FileUtilities.GetCacheDirectory()
+[build]    鍦? Microsoft.Build.Shared.FileUtilities.ClearCacheDirectory()
+[build]    鍦? Microsoft.Build.CommandLine.MSBuildApp.BuildProject(String projectFile, String[] targets, String toolsVersion, Dictionary`2 globalProperties, Dictionary`2 restoreProperties, ILogger[] loggers, LoggerVerbosity verbosity, DistributedLoggerRecord[] distributedLoggerRecords, Boolean needToValidateProject, String schemaFile, Int32 cpuCount, Boolean enableNodeReuse, TextWriter preprocessWriter, TextWriter targetsWriter, Boolean detailedSummary, ISet`1 warningsAsErrors, ISet`1 warningsNotAsErrors, ISet`1 warningsAsMessages, Boolean enableRestore, ProfilerLogger profilerLogger, Boolean enableProfiler, Boolean interactive, ProjectIsolationMode isolateProjects, GraphBuildOptions graphBuildOptions, Boolean lowPriority, Boolean question, Boolean isBuildCheckEnabled, String[] inputResultsCaches, String outputResultsCache, Boolean saveProjectResult, BuildResult& result, Boolean reportFileAccesses, String commandLine)
+[build]    鍦? Microsoft.Build.CommandLine.MSBuildApp.Execute(String commandLine)
+[build] 
+[build] 
+[build]    鐢变簬 Exception.ToString() 澶辫触锛屽洜姝ゆ棤娉曟墦鍗板紓甯稿瓧绗︿覆銆?
+[proc] 命令“"C:\Program Files\CMake\bin\cmake.EXE" --build d:/QTALLPROJECTS/ForceMindMap/build --config Debug --target ALL_BUILD -j 24 --”已退出，代码为 3762504530
+[driver] 生成完毕: 00:00:00.405
+[build] 生成已完成，退出代码为 3762504530

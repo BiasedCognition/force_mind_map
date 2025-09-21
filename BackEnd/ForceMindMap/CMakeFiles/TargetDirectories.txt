@@ -1,0 +1,4 @@
+D:/QTALLPROJECTS/ForceMindMap/CMakeFiles/ForceMindMap.dir
+D:/QTALLPROJECTS/ForceMindMap/CMakeFiles/ForceMindMap_qmlimportscan.dir
+D:/QTALLPROJECTS/ForceMindMap/CMakeFiles/ALL_BUILD.dir
+D:/QTALLPROJECTS/ForceMindMap/CMakeFiles/ZERO_CHECK.dir

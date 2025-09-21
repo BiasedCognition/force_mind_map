@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="resources/index.html">D:/QTALLPROJECTS/ForceMindMap/resources/index.html</file>
+    <file alias="resources/d3.v7.min.js">D:/QTALLPROJECTS/ForceMindMap/resources/d3.v7.min.js</file>
+    <file alias="resources/mindmap.js">D:/QTALLPROJECTS/ForceMindMap/resources/mindmap.js</file>
+  </qresource>
+</RCC>
+

@@ -1,0 +1,32 @@
+^D:\MINDMAP\MINDMAP\BACKEND\FORCEMINDMAP\LOCAL_BUILD\CMAKEFILES\DCF4C39B2492C3B887A41B79B8685CF2\FORCEMINDMAP_BUILD.CMAKE.RULE
+setlocal
+cd D:\MindMap\MindMap\BackEnd\ForceMindMap
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+call D:\MindMap\MindMap\BackEnd\ForceMindMap\local_build\.qt\bin\qt_setup_tool_path.bat D:/Qt/6.9.1/msvc2022_64/bin/qmlimportscanner.exe @D:/MindMap/MindMap/BackEnd/ForceMindMap/local_build/.qt/qml_imports/ForceMindMap_build.rsp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\MINDMAP\MINDMAP\BACKEND\FORCEMINDMAP\LOCAL_BUILD\CMAKEFILES\C2958565DB4B1B15DDE6F9BA1710ED14\FORCEMINDMAP_QMLIMPORTSCAN.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\MINDMAP\MINDMAP\BACKEND\FORCEMINDMAP\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/MindMap/MindMap/BackEnd/ForceMindMap -BD:/MindMap/MindMap/BackEnd/ForceMindMap/local_build --check-stamp-file D:/MindMap/MindMap/BackEnd/ForceMindMap/local_build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

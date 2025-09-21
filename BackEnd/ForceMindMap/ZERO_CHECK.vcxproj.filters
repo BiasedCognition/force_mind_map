@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\QTALLPROJECTS\ForceMindMap\CMakeFiles\7841cd70e179cfba2afbf1bd0df02d13\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7F3EDCA1-F40E-3557-85B3-D6BAF7C5516C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

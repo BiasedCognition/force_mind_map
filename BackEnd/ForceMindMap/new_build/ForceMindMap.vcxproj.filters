@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\ForceMindMap_autogen\mocs_compilation_Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\src\MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\src\WebNodeManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\src\AppConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\.qt\rcc\qrc_resources.cpp">
+      <Filter>Source Files\Generated</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\ForceMindMap_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\ForceMindMap_autogen\mocs_compilation_MinSizeRel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\ForceMindMap_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\include\WebNodeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\include\MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\include\AppConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\.qt\rcc\resources.qrc">
+      <Filter>Source Files\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\resources\index.html" />
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\resources\favicon.ico" />
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\resources\d3.v7.min.js">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\resources\mindmap.js">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\new_build\CMakeFiles\06fa748f50b62a9c80d3b69e58bb6c16\qrc_resources.cpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\MindMap\MindMap\BackEnd\ForceMindMap\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{047E0F2E-7EBE-3079-9A2A-23465EEB8CC2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{86747737-3403-323F-B70D-D472742EE609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{CAD665B4-7CC8-3CD2-8D8D-16D37C074C52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Generated">
+      <UniqueIdentifier>{7B003041-4C4E-32BD-B9E3-28391644AA6B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+^D:\MINDMAP\MINDMAP\BACKEND\FORCEMINDMAP\NEW_BUILD\CMAKEFILES\5225A79C7EF3BBB7E5379160380DA447\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/MindMap/MindMap/BackEnd/ForceMindMap -BD:/MindMap/MindMap/BackEnd/ForceMindMap/new_build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/MindMap/MindMap/BackEnd/ForceMindMap/new_build/ForceMindMap.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

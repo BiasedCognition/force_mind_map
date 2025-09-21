@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\build\WebEngineTest_autogen\mocs_compilation_Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\WebEngineTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\build\WebEngineTest_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\build\WebEngineTest_autogen\mocs_compilation_MinSizeRel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\build\WebEngineTest_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\MindMap\MindMap\BackEnd\WebEngineTest\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{AC5DB191-E628-3B38-82D9-11114B9C1F5E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
