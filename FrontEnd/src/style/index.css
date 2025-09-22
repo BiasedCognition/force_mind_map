@@ -1,0 +1,48 @@
+/* Tailwind CSS 4.x 配置 */
+@import "tailwindcss";
+
+/* 明显的全局样式 - 用于立即验证CSS文件是否被加载 */
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* 简单的非Tailwind测试规则 - 用于验证CSS文件是否被加载 */
+#css-test-element {
+  background-color: green !important;
+  color: white !important;
+  padding: 20px !important;
+  margin: 10px !important;
+  border-radius: 5px !important;
+  font-weight: bold !important;
+}
+
+/* 基础样式 */
+@layer base {
+  /* 添加一些明显的基础样式 */
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+}
+
+/* 自定义工具类 */
+@layer utilities {
+  /* 为测试添加一些明显的类 */
+  .test-bg {
+    background-color: #0366d6;
+  }
+  
+  .test-text {
+    color: white;
+  }
+  
+  .test-padding {
+    padding: 1rem;
+  }
+  
+  /* 添加一个非常明显的工具类 */
+  .highlight-border {
+    border: 3px solid purple;
+    border-style: dashed;
+  }
+}

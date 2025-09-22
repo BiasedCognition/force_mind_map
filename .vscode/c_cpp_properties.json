@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "d:/MindMap/MindMap/BackEnd/ForceMindMap/include",
+                "d:/MindMap/MindMap/BackEnd/ForceMindMap/src",
+                "D:/Qt/6.9.1/msvc2022_64/include/**",
+                "d:/MindMap/MindMap/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "browse": {
+                "path": [
+                    "d:/MindMap/MindMap/BackEnd/ForceMindMap/include",
+                    "d:/MindMap/MindMap/BackEnd/ForceMindMap/src",
+                    "D:/Qt/6.9.1/msvc2022_64/include/**",
+                    "d:/MindMap/MindMap/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}

@@ -35,8 +35,8 @@ public:
             // 开发模式：加载Vue开发服务器
             return "http://localhost:5173";
         } else {
-            // 生产模式：加载test1目录下构建后的前端资源
-            return "file:///d:/MindMap/MindMap/test1/dist/index.html";
+            // 生产模式：加载FrontEnd目录下构建后的前端资源
+            return "file:///d:/MindMap/MindMap/FrontEnd/dist/index.html";
         }
     }
 

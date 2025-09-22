@@ -38,7 +38,7 @@ void MainWindow::setupWebView()
 
     // 加载 Vue 前端构建的 HTML 文件
     // 注意：这里需要先构建 Vue 项目，然后将构建后的文件路径更新为实际路径
-    QUrl url = QUrl::fromLocalFile("D:/MindMap/MindMap/MindMap/dist/index.html");
+    QUrl url = QUrl::fromLocalFile("D:/MindMap/MindMap/FrontEnd/dist/index.html");
     m_webView->load(url);
 
     setCentralWidget(m_webView);
