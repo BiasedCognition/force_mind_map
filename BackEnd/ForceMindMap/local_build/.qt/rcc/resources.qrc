@@ -1,9 +1,0 @@
-<RCC>
-  <qresource prefix="/">
-    <file alias="resources/index.html">D:/MindMap/MindMap/BackEnd/ForceMindMap/resources/index.html</file>
-    <file alias="resources/favicon.ico">D:/MindMap/MindMap/BackEnd/ForceMindMap/resources/favicon.ico</file>
-    <file alias="resources/d3.v7.min.js">D:/MindMap/MindMap/BackEnd/ForceMindMap/resources/d3.v7.min.js</file>
-    <file alias="resources/mindmap.js">D:/MindMap/MindMap/BackEnd/ForceMindMap/resources/mindmap.js</file>
-  </qresource>
-</RCC>
-

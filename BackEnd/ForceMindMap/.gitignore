@@ -1,3 +1,11 @@
-build/
+
+
+# Build cache
 *.vcxproj
 *.vcxproj.filters
+*.sln
+
+# Build Targe cache
+local_build/*
+new_build/*
+build/
