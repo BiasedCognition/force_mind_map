@@ -1,0 +1,3 @@
+build/
+*.vcxproj
+*.vcxproj.filters
